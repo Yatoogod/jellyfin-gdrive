@@ -1,3 +1,3 @@
 #!/bin/bash
-/mount-gdrive.sh
-/jellyfin/jellyfin
+mkdir -p /media/gdrive
+rclone mount gdrive:/ /media/gdrive --allow-other &
