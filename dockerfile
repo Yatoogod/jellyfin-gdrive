@@ -1,6 +1,10 @@
-# Filename: Dockerfile
+# Recommended Dockerfile
 FROM jellyfin/jellyfin:latest
 
-# Optional: Add custom configurations
-COPY rclone /etc/rclone
-COPY docker-compose.yml /app/
+# Ensure permissions are correct
+WORKDIR /app
+COPY . .
+RUN chmod +x ./entrypoint.sh # If you have an entrypoint script
+
+# Optional: Install additional dependencies
+# RUN apt-get update && apt-get install -y rclone
