@@ -1,11 +1,13 @@
-# Base image
 FROM jellyfin/jellyfin:latest
 
-# Install required packages and Rclone
+# Add FUSE support and debugging tools
 RUN apt-get update && apt-get install -y \
-    curl unzip fuse3 && \
-    curl https://rclone.org/install.sh | bash && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    curl unzip fuse3 libfuse2 \
+    && curl https://rclone.org/install.sh | bash \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Add these lines to ensure FUSE works in container
+RUN echo "user_allow_other" >> /etc/fuse.conf
 
 # Set up Rclone configuration
 COPY rclone.conf /root/.config/rclone/rclone.conf
