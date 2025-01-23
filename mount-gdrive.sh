@@ -1,27 +1,26 @@
 #!/bin/bash
-# Define variables
-RCLONE_CONFIG="/root/.config/rclone/rclone.conf"
-MOUNT_POINT="/mnt/gdrive"
-LOG_FILE="/var/log/rclone.log"
-RCLONE_REMOTE="gdrive:"
+# Minimal Google Drive Mounting Script for Northflank
 
-# Ensure mount point exists
+MOUNT_POINT="/mnt/gdrive"
+RCLONE_REMOTE="gdrive:"
+RCLONE_CONFIG="/root/.config/rclone/rclone.conf"
+LOG_FILE="/var/log/rclone.log"
+
+# Ensure mount directory exists
 mkdir -p "$MOUNT_POINT"
 
-# Unmount if already mounted
-fusermount -u "$MOUNT_POINT" || true
+# Attempt mounting with detailed debugging
+rclone mount "$RCLONE_REMOTE" "$MOUNT_POINT" \
+   --config="$RCLONE_CONFIG" \
+   --vfs-cache-mode writes \
+   --allow-other \
+   --log-level DEBUG \
+   --log-file="$LOG_FILE" \
+   --foreground
 
-# Mount Google Drive
-rclone mount $RCLONE_REMOTE "$MOUNT_POINT" \
-    --config "$RCLONE_CONFIG" \
-    --vfs-cache-mode writes \
-    --allow-other \
-    --dir-cache-time 5m \
-    --poll-interval 1m \
-    --log-level DEBUG \
-    --log-file "$LOG_FILE" \
-    --daemon
-
-# Check mount status
-sleep 5
-mountpoint -q "$MOUNT_POINT" && echo "Drive mounted successfully" || echo "Mount failed"
+# If mount fails, output debug information
+if [ $? -ne 0 ]; then
+   echo "Mounting failed. Check $LOG_FILE for details."
+   cat "$LOG_FILE"
+   exit 1
+fi
