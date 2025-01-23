@@ -1,9 +1,9 @@
 #!/bin/bash
+# Load FUSE kernel module
+modprobe fuse || true
 
 # Mount Google Drive using Rclone
 /mount-gdrive.sh &
-
-# Wait a bit to ensure the mount is ready
 sleep 5
 
 # Start Jellyfin
