@@ -1,18 +1,24 @@
-name: Docker Image CI
+# .github/workflows/deploy.yml
+name: Deploy to Clever Cloud
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - uses: actions/checkout@v3
+    
+    - name: Install Clever Cloud CLI
+      run: |
+        npm install -g clever-tools
+    
+    - name: Deploy to Clever Cloud
+      env:
+        CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+        CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+      run: |
+        clever login
+        clever deploy
