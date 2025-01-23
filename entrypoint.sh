@@ -1,10 +1,14 @@
 #!/bin/bash
-# Load FUSE kernel module
-modprobe fuse || true
+# Ensure FUSE is loaded
+if command -v fusermount3 >/dev/null 2>&1; then
+    echo "FUSE available"
+else
+    echo "FUSE not found, installing..."
+    apt-get update && apt-get install -y fuse3
+fi
 
-# Mount Google Drive using Rclone
+# Mount Google Drive
 /mount-gdrive.sh &
-sleep 5
 
 # Start Jellyfin
 exec /jellyfin/jellyfin "$@"
